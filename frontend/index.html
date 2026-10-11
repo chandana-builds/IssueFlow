@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IssueFlow — Smart Issue & Bug Tracking System</title>
+  <meta name="description" content="A full-stack agile issue and bug tracking platform with interactive Kanban board, real-time audit activity logs, and analytics.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <span class="brand-title">IssueFlow</span>
+        <span class="brand-badge">v1.0</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9" rx="1"/>
+            <rect x="14" y="3" width="7" height="5" rx="1"/>
+            <rect x="14" y="12" width="7" height="9" rx="1"/>
+            <rect x="3" y="16" width="7" height="5" rx="1"/>
+          </svg>
+          Dashboard
+        </a>
+        <a class="nav-item" data-view="board" id="nav-board">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="4" y="3" width="4" height="18" rx="1"/>
+            <rect x="10" y="3" width="4" height="12" rx="1"/>
+            <rect x="16" y="3" width="4" height="15" rx="1"/>
+          </svg>
+          Kanban Board
+        </a>
+        <a class="nav-item" data-view="issues" id="nav-issues">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+          All Issues
+        </a>
+        <a class="nav-item" data-view="team" id="nav-team">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          Team Members
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/api/docs" target="_blank" class="nav-item" style="padding: 0.5rem 0;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          API Docs (Swagger)
+        </a>
+        <span>IssueFlow &copy; 2026</span>
+        <span>MLH Fellowship Code Sample</span>
+      </div>
+    </aside>
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+      <!-- Top Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" id="mobile-toggle" aria-label="Toggle Navigation">
+            <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" fill="none" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" class="search-input" id="global-search" placeholder="Search issues, keys, tags... (Press /)">
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button class="btn btn-primary" id="btn-create-issue">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New Issue
+          </button>
+
+          <!-- User Menu -->
+          <div class="user-profile-menu">
+            <button class="user-btn" id="user-menu-btn">
+              <div class="user-avatar" id="header-avatar" style="background:#6366f1;">SC</div>
+              <span class="user-name" id="header-username">Sarah Chen</span>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="user-dropdown" id="user-dropdown">
+              <div class="dropdown-item" id="btn-quick-login">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Switch Account / Login
+              </div>
+              <div class="dropdown-item" id="btn-logout" style="color: #f87171;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Sign Out
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable Main Content -->
+      <main class="content-area">
+        <!-- 1. DASHBOARD VIEW -->
+        <section class="view-section active" id="view-dashboard">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Project Overview & Analytics</h1>
+              <p class="page-subtitle">Real-time bug velocity, issue statuses, and sprint activity logs</p>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="btn-refresh-dashboard">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="23 4 23 10 17 10"/>
+                <polyline points="1 20 1 14 7 14"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
+
+          <!-- KPI Cards Grid -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <span class="kpi-label">Total Issues</span>
+              <div class="kpi-value" id="kpi-total">0</div>
+              <div class="kpi-footer">Across all workflow states</div>
+            </div>
+            <div class="kpi-card kpi-open">
+              <span class="kpi-label">Open / Backlog</span>
+              <div class="kpi-value" id="kpi-open">0</div>
+              <div class="kpi-footer">Pending triage or kickoff</div>
+            </div>
+            <div class="kpi-card kpi-progress">
+              <span class="kpi-label">In Progress</span>
+              <div class="kpi-value" id="kpi-progress">0</div>
+              <div class="kpi-footer">Actively in development</div>
+            </div>
+            <div class="kpi-card kpi-resolved">
+              <span class="kpi-label">Resolution Rate</span>
+              <div class="kpi-value" id="kpi-resolution">0%</div>
+              <div class="kpi-footer" id="kpi-resolved-count">0 resolved / closed</div>
+            </div>
+            <div class="kpi-card kpi-overdue">
+              <span class="kpi-label">Overdue Issues</span>
+              <div class="kpi-value" id="kpi-overdue">0</div>
+              <div class="kpi-footer">Exceeded target due date</div>
+            </div>
+          </div>
+
+          <!-- Charts & Activity Row -->
+          <div class="dashboard-grid">
+            <div class="dashboard-card">
+              <div class="card-title-bar">
+                <h3 class="card-title">Status & Priority Breakdown</h3>
+              </div>
+              <div class="chart-container">
+                <!-- SVG Donut Chart -->
+                <svg class="chart-svg" viewBox="0 0 100 100" id="status-donut-chart">
+                  <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="18"/>
+                  <circle id="donut-open" class="donut-segment" cx="50" cy="50" r="36" stroke="#10b981" stroke-dasharray="0 226.2" stroke-dashoffset="0"/>
+                  <circle id="donut-progress" class="donut-segment" cx="50" cy="50" r="36" stroke="#f59e0b" stroke-dasharray="0 226.2" stroke-dashoffset="0"/>
+                  <circle id="donut-resolved" class="donut-segment" cx="50" cy="50" r="36" stroke="#6366f1" stroke-dasharray="0 226.2" stroke-dashoffset="0"/>
+                  <circle id="donut-closed" class="donut-segment" cx="50" cy="50" r="36" stroke="#64748b" stroke-dasharray="0 226.2" stroke-dashoffset="0"/>
+                </svg>
+
+                <div class="chart-legend" id="status-legend">
+                  <div class="legend-item"><span class="legend-color" style="background:var(--status-open)"></span> Open <span class="legend-count" id="legend-count-open">0</span></div>
+                  <div class="legend-item"><span class="legend-color" style="background:var(--status-inprogress)"></span> In Progress <span class="legend-count" id="legend-count-progress">0</span></div>
+                  <div class="legend-item"><span class="legend-color" style="background:var(--status-resolved)"></span> Resolved <span class="legend-count" id="legend-count-resolved">0</span></div>
+                  <div class="legend-item"><span class="legend-color" style="background:var(--status-closed)"></span> Closed <span class="legend-count" id="legend-count-closed">0</span></div>
+                </div>
+              </div>
+
+              <!-- Priority Distribution Bars -->
+              <div class="priority-bars" id="priority-bars-container">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+
+            <!-- Recent Activity Timeline -->
+            <div class="dashboard-card">
+              <div class="card-title-bar">
+                <h3 class="card-title">Live Audit Stream</h3>
+                <span class="brand-badge">Real-time</span>
+              </div>
+              <div class="activity-feed" id="dashboard-activity-feed">
+                <!-- Activity items rendered here -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. KANBAN BOARD VIEW -->
+        <section class="view-section" id="view-board">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Agile Workflow Board</h1>
+              <p class="page-subtitle">Drag issues between stages or click to update status immediately</p>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-secondary btn-sm" id="btn-board-filter-my">My Assigned</button>
+              <button class="btn btn-secondary btn-sm" id="btn-board-filter-all">View All</button>
+            </div>
+          </div>
+
+          <div class="board-container">
+            <!-- Open Column -->
+            <div class="board-column" data-status="OPEN">
+              <div class="column-header">
+                <div class="col-title-group">
+                  <span class="col-badge col-badge-open"></span>
+                  <span class="column-title">Open</span>
+                </div>
+                <span class="column-count" id="count-open">0</span>
+              </div>
+              <div class="column-cards" id="cards-open" data-status="OPEN"></div>
+            </div>
+
+            <!-- In Progress Column -->
+            <div class="board-column" data-status="IN_PROGRESS">
+              <div class="column-header">
+                <div class="col-title-group">
+                  <span class="col-badge col-badge-in-progress"></span>
+                  <span class="column-title">In Progress</span>
+                </div>
+                <span class="column-count" id="count-in_progress">0</span>
+              </div>
+              <div class="column-cards" id="cards-in_progress" data-status="IN_PROGRESS"></div>
+            </div>
+
+            <!-- Resolved Column -->
+            <div class="board-column" data-status="RESOLVED">
+              <div class="column-header">
+                <div class="col-title-group">
+                  <span class="col-badge col-badge-resolved"></span>
+                  <span class="column-title">Resolved</span>
+                </div>
+                <span class="column-count" id="count-resolved">0</span>
+              </div>
+              <div class="column-cards" id="cards-resolved" data-status="RESOLVED"></div>
+            </div>
+
+            <!-- Closed Column -->
+            <div class="board-column" data-status="CLOSED">
+              <div class="column-header">
+                <div class="col-title-group">
+                  <span class="col-badge col-badge-closed"></span>
+                  <span class="column-title">Closed</span>
+                </div>
+                <span class="column-count" id="count-closed">0</span>
+              </div>
+              <div class="column-cards" id="cards-closed" data-status="CLOSED"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. ISSUES TABLE VIEW -->
+        <section class="view-section" id="view-issues">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Issue Catalog</h1>
+              <p class="page-subtitle">Search, filter by multiple dimensions, and export issue records</p>
+            </div>
+            <div style="display:flex; gap:0.5rem;">
+              <button class="btn btn-secondary btn-sm" id="btn-export-csv">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Export CSV
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Toolbar -->
+          <div class="filter-toolbar">
+            <select class="filter-select" id="filter-status">
+              <option value="ALL">Status: All</option>
+              <option value="OPEN">Open</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="RESOLVED">Resolved</option>
+              <option value="CLOSED">Closed</option>
+            </select>
+
+            <select class="filter-select" id="filter-priority">
+              <option value="ALL">Priority: All</option>
+              <option value="CRITICAL">Critical</option>
+              <option value="HIGH">High</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="LOW">Low</option>
+            </select>
+
+            <select class="filter-select" id="filter-type">
+              <option value="ALL">Type: All</option>
+              <option value="BUG">Bug</option>
+              <option value="FEATURE">Feature</option>
+              <option value="TASK">Task</option>
+              <option value="IMPROVEMENT">Improvement</option>
+            </select>
+
+            <select class="filter-select" id="filter-assignee">
+              <option value="ALL">Assignee: All</option>
+              <option value="-1">Unassigned</option>
+            </select>
+
+            <button class="btn btn-secondary btn-sm" id="btn-clear-filters">Reset Filters</button>
+          </div>
+
+          <!-- Issues Table -->
+          <div class="table-responsive">
+            <table class="issues-table">
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Type</th>
+                  <th>Assignee</th>
+                  <th>Reporter</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="issues-table-body">
+                <!-- Injected via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. TEAM DIRECTORY VIEW -->
+        <section class="view-section" id="view-team">
+          <div class="page-header">
+            <div>
+              <h1 class="page-title">Team Directory</h1>
+              <p class="page-subtitle">Project collaborators, roles, and issue assignment workload</p>
+            </div>
+          </div>
+
+          <div class="kpi-grid" id="team-cards-grid">
+            <!-- Injected via JavaScript -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODALS
+       ======================================================================== -->
+
+  <!-- Modal: Create / Edit Issue -->
+  <div class="modal-overlay" id="modal-create-issue">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="create-modal-title">Create New Issue</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-create-issue">
+        <div class="modal-body">
+          <input type="hidden" id="edit-issue-id" value="">
+          
+          <div class="form-group">
+            <label class="form-label" for="issue-title">Issue Title *</label>
+            <input type="text" id="issue-title" class="form-control" placeholder="e.g. Memory leak in session worker thread" required minlength="3">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="issue-type">Type</label>
+              <select id="issue-type" class="form-control">
+                <option value="BUG">Bug</option>
+                <option value="FEATURE">Feature</option>
+                <option value="TASK">Task</option>
+                <option value="IMPROVEMENT">Improvement</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="issue-priority">Priority</label>
+              <select id="issue-priority" class="form-control">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM" selected>Medium</option>
+                <option value="HIGH">High</option>
+                <option value="CRITICAL">Critical</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="issue-assignee">Assignee</label>
+              <select id="issue-assignee" class="form-control">
+                <option value="">Unassigned</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="issue-tags">Tags (comma separated)</label>
+              <input type="text" id="issue-tags" class="form-control" placeholder="auth, backend, urgent">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="issue-description">Description & Details</label>
+            <textarea id="issue-description" class="form-control" placeholder="Provide context, reproduction steps, or acceptance criteria..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-issue">Save Issue</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Issue Detail Drawer -->
+  <div class="modal-overlay" id="modal-issue-detail">
+    <div class="modal-card drawer-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <span class="issue-key" id="detail-key" style="font-size:0.95rem;">ISF-1</span>
+          <h3 class="modal-title" id="detail-title" style="font-size:1.15rem;">Issue Title</h3>
+        </div>
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <button class="btn btn-secondary btn-sm" id="btn-edit-current-issue">Edit</button>
+          <button class="btn btn-danger btn-sm" id="btn-delete-current-issue">Delete</button>
+          <button class="modal-close" data-close-modal>&times;</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="detail-layout">
+          <!-- Main Left Column -->
+          <div>
+            <div class="form-group">
+              <div class="meta-label">Description</div>
+              <div id="detail-description" style="color:var(--text-main); line-height:1.6; margin-top:0.35rem; font-size:0.9rem; background:rgba(255,255,255,0.02); padding:0.85rem; border-radius:var(--radius-md); border:1px solid var(--border-color); white-space:pre-wrap;">
+                No description provided.
+              </div>
+            </div>
+
+            <!-- Tabs: Comments vs Activity History -->
+            <div class="comments-section">
+              <div class="tab-nav">
+                <button class="tab-btn active" id="tab-comments-btn">Discussion (<span id="detail-comments-count">0</span>)</button>
+                <button class="tab-btn" id="tab-activities-btn">Audit History (<span id="detail-activities-count">0</span>)</button>
+              </div>
+
+              <!-- Comments Tab Content -->
+              <div id="tab-content-comments">
+                <div class="comment-list" id="detail-comments-list">
+                  <!-- Injected via JavaScript -->
+                </div>
+                <form id="form-add-comment" style="display:flex; gap:0.5rem; margin-top:0.75rem;">
+                  <input type="text" id="comment-input" class="form-control" placeholder="Write a comment or update..." required>
+                  <button type="submit" class="btn btn-primary btn-sm">Send</button>
+                </form>
+              </div>
+
+              <!-- Activities Tab Content -->
+              <div id="tab-content-activities" style="display:none;">
+                <div class="activity-feed" id="detail-activities-list">
+                  <!-- Injected via JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Meta Right Column -->
+          <div class="detail-meta-box">
+            <div class="meta-item">
+              <span class="meta-label">Status</span>
+              <select id="detail-status-select" class="filter-select" style="width:100%;">
+                <option value="OPEN">Open</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="RESOLVED">Resolved</option>
+                <option value="CLOSED">Closed</option>
+              </select>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Priority</span>
+              <select id="detail-priority-select" class="filter-select" style="width:100%;">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="CRITICAL">Critical</option>
+              </select>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Assignee</span>
+              <select id="detail-assignee-select" class="filter-select" style="width:100%;">
+                <option value="">Unassigned</option>
+              </select>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Type</span>
+              <span id="detail-type-badge"></span>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Reporter</span>
+              <span id="detail-reporter-name" style="font-size:0.85rem; font-weight:500;">-</span>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Created At</span>
+              <span id="detail-created-at" style="font-size:0.8rem; color:var(--text-muted);">-</span>
+            </div>
+
+            <div class="meta-item">
+              <span class="meta-label">Tags</span>
+              <div id="detail-tags-list" class="card-tags" style="margin-top:0.25rem;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Authentication & Demo Switcher -->
+  <div class="modal-overlay" id="modal-auth">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Sign In to IssueFlow</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Quick Demo Switcher Section -->
+        <div style="background: rgba(99, 102, 241, 0.1); border:1px solid rgba(99, 102, 241, 0.3); border-radius:var(--radius-md); padding:0.85rem; margin-bottom:1.25rem;">
+          <div style="font-size:0.75rem; text-transform:uppercase; color:#818cf8; font-weight:600; margin-bottom:0.5rem;">
+            Quick 1-Click Demo Evaluation
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.4rem;">
+            <button class="btn btn-secondary btn-sm" id="btn-demo-admin" style="justify-content:flex-start;">
+              👑 Sarah Chen (Team Lead / Admin)
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-demo-alex" style="justify-content:flex-start;">
+              💻 Alex Rivera (Senior Developer)
+            </button>
+            <button class="btn btn-secondary btn-sm" id="btn-demo-priya" style="justify-content:flex-start;">
+              🔍 Priya Patel (QA Lead / Tester)
+            </button>
+          </div>
+        </div>
+
+        <form id="form-auth-login">
+          <div class="form-group">
+            <label class="form-label" for="login-email">Username or Email</label>
+            <input type="text" id="login-email" class="form-control" required placeholder="admin@issueflow.dev">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input type="password" id="login-password" class="form-control" required placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; margin-top:0.5rem;">Log In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
