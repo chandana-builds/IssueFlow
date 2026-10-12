@@ -1,5 +1,10 @@
 # IssueFlow
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-issueflow--1.onrender.com-success?style=for-the-badge&logo=render)](https://issueflow-1.onrender.com/)
+
+🔗 **Live Application**: [https://issueflow-1.onrender.com/](https://issueflow-1.onrender.com/)  
+📖 **Interactive Swagger Docs**: [https://issueflow-1.onrender.com/api/docs](https://issueflow-1.onrender.com/api/docs)
+
 A lightweight, full-stack bug and issue tracking system built with Python (FastAPI), SQLAlchemy, and a vanilla JavaScript frontend. 
 
 I built this project to solve a common problem small dev teams and hackathon squads face: heavy enterprise tools like Jira are often too bloated and slow for fast-paced development, while simple Kanban apps like Trello lack bug-tracking essentials (severity levels, audit trails, and reproducible bug reports).
@@ -58,6 +63,15 @@ IssueFlow/
 
 4. **Zero-Build Vanilla Frontend**:
    Instead of adding a heavy node_modules bundle with React or Tailwind build pipelines, I wrote the frontend with clean semantic HTML5, modern CSS (flexbox, grid, glassmorphism tokens), and vanilla JS. It loads instantly, has zero npm dependencies, and works out of the box when you start the Python server.
+
+---
+
+## 🌐 Live Deployment
+
+IssueFlow is deployed live on Render:
+- **Live Web App**: [https://issueflow-1.onrender.com/](https://issueflow-1.onrender.com/)
+- **Interactive Swagger API Docs**: [https://issueflow-1.onrender.com/api/docs](https://issueflow-1.onrender.com/api/docs)
+- **Alternative ReDoc**: [https://issueflow-1.onrender.com/api/redoc](https://issueflow-1.onrender.com/api/redoc)
 
 ---
 
